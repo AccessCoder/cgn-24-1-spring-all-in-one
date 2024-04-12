@@ -1,5 +1,11 @@
 package de.neuefische.todobackend.todo;
 
+import de.neuefische.todobackend.dto.TodoWOId;
+import de.neuefische.todobackend.model.Todo;
+import de.neuefische.todobackend.service.IdService;
+import de.neuefische.todobackend.repository.TodoRepository;
+import de.neuefische.todobackend.service.TodoService;
+import de.neuefische.todobackend.model.TodoStatus;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,111 +17,104 @@ import static org.mockito.Mockito.*;
 
 class TodoServiceTest {
 
-    TodoRepository todoRepository = mock(TodoRepository.class);
-    IdService idService = mock(IdService.class);
-    TodoService todoService = new TodoService(todoRepository, idService);
+    TodoRepository mockrepo = mock(TodoRepository.class);
+    IdService mockIdService = mock(IdService.class);
+    TodoService todoService = new TodoService(mockrepo, mockIdService);
 
     @Test
-    void findAllTodos() {
+    void findAllTodos_shouldReturn_t1_t2_t2_whenCalled() {
         //GIVEN
         Todo t1 = new Todo("1", "d1", TodoStatus.OPEN);
         Todo t2 = new Todo("2", "d2", TodoStatus.OPEN);
         Todo t3 = new Todo("3", "d3", TodoStatus.OPEN);
         List<Todo> todos = List.of(t1, t2, t3);
 
-        when(todoRepository.findAll()).thenReturn(todos);
+        when(mockrepo.findAll()).thenReturn(todos);
 
         //WHEN
         List<Todo> actual = todoService.findAllTodos();
 
         //THEN
-
-        verify(todoRepository).findAll();
+        verify(mockrepo).findAll();
         assertEquals(todos, actual);
     }
 
     @Test
-    void addTodo() {
+    void addTodo_shouldSaveTodoWithIdIntoDatabase_whenCalledWithDto() {
         //GIVEN
-        NewTodo newTodo = new NewTodo("Test-Description", TodoStatus.OPEN);
+        TodoWOId newTodo = new TodoWOId("Test-Description", TodoStatus.OPEN);
         Todo todoToSave = new Todo("Test-Id", "Test-Description", TodoStatus.OPEN);
 
-        when(idService.randomId()).thenReturn("Test-Id");
-        when(todoRepository.save(todoToSave)).thenReturn(todoToSave);
+        when(mockIdService.randomId()).thenReturn("Test-Id");
+        when(mockrepo.save(todoToSave)).thenReturn(todoToSave);
 
         //WHEN
-
         Todo actual = todoService.addTodo(newTodo);
 
         //THEN
-        verify(idService).randomId();
-        verify(todoRepository).save(todoToSave);
+        verify(mockIdService).randomId();
+        verify(mockrepo).save(todoToSave);
         assertEquals(todoToSave, actual);
     }
 
     @Test
-    void updateTodo() {
+    void updateTodo_shouldReturnUpdatedTodo_whenCalledWithValidIdAndDto() {
         //GIVEN
         String id = "123";
-        UpdateTodo todoToUpdate = new UpdateTodo("test-description", TodoStatus.IN_PROGRESS);
+        TodoWOId todoToUpdate = new TodoWOId("test-description", TodoStatus.IN_PROGRESS);
 
         Todo updatedTodo = new Todo("123", "test-description", TodoStatus.IN_PROGRESS);
 
-        when(todoRepository.save(updatedTodo)).thenReturn(updatedTodo);
+        when(mockrepo.save(updatedTodo)).thenReturn(updatedTodo);
 
         //WHEN
-
         Todo actual = todoService.updateTodo(todoToUpdate, id);
 
         //THEN
-        verify(todoRepository).save(updatedTodo);
-
+        verify(mockrepo).save(updatedTodo);
         assertEquals(updatedTodo, actual);
     }
 
     @Test
-    void getTodoByIdTest_whenValidId_ThenReturnTodo() {
+    void getTodoByIdTest_shouldReturnTodo_whenCalledWithValidId() {
         //GIVEN
         String id = "1";
         Todo todo = new Todo("1", "test-description", TodoStatus.OPEN);
 
-        when(todoRepository.findById(id)).thenReturn(Optional.of(todo));
+        when(mockrepo.findById(id)).thenReturn(Optional.of(todo));
 
         //WHEN
-
         Todo actual = todoService.findTodoById(id);
 
         //THEN
-        verify(todoRepository).findById(id);
+        verify(mockrepo).findById(id);
         assertEquals(todo, actual);
     }
 
     @Test
-    void getTodoByIdTest_whenInvalidId_ThenThrowException() {
+    void getTodoByIdTest_shouldThrowException_whenCalledWithInvalidId() {
         //GIVEN
         String id = "1";
 
-        when(todoRepository.findById(id)).thenReturn(Optional.empty());
+        when(mockrepo.findById(id)).thenReturn(Optional.empty());
 
         //WHEN
-
         assertThrows(NoSuchElementException.class, () -> todoService.findTodoById(id));
 
         //THEN
-        verify(todoRepository).findById(id);
+        verify(mockrepo).findById(id);
     }
 
     @Test
-    void deleteTodo() {
+    void deleteTodo_shouldCallDeleteMethodFromRepo_WhenCalledWithValidId() {
         //GIVEN
         String id = "1";
-        doNothing().when(todoRepository).deleteById(id);
+        doNothing().when(mockrepo).deleteById(id);
 
         //WHEN
-
         todoService.deleteTodo(id);
 
         //THEN
-        verify(todoRepository).deleteById(id);
+        verify(mockrepo).deleteById(id);
     }
 }

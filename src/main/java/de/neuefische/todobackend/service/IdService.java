@@ -1,4 +1,4 @@
-package de.neuefische.todobackend.todo;
+package de.neuefische.todobackend.service;
 
 import org.springframework.stereotype.Service;
 

@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NOT_FOUND)//-> Erzeugt eine ResponseEntity mit Http 404
     public ErrorMessage handleNoSuchElementException(NoSuchElementException exception) {
 
         return new ErrorMessage(exception.getMessage());

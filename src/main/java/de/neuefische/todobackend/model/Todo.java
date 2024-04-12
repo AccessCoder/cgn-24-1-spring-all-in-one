@@ -1,4 +1,6 @@
-package de.neuefische.todobackend.todo;
+package de.neuefische.todobackend.model;
+
+import de.neuefische.todobackend.model.TodoStatus;
 
 public record Todo(
         String id,

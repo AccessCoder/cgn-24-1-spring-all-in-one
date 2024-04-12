@@ -1,12 +1,15 @@
-package de.neuefische.todobackend.todo;
+package de.neuefische.todobackend.service;
 
+import de.neuefische.todobackend.dto.TodoWOId;
+import de.neuefische.todobackend.model.Todo;
+import de.neuefische.todobackend.repository.TodoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class TodoService {
+public class TodoService implements TdService{
 
     private final TodoRepository todoRepository;
     private final IdService idService;
@@ -20,15 +23,15 @@ public class TodoService {
         return todoRepository.findAll();
     }
 
-    public Todo addTodo(NewTodo newTodo) {
+    public Todo addTodo(TodoWOId todoWOId) {
         String id = idService.randomId();
 
-        Todo todoToSave = new Todo(id, newTodo.description(), newTodo.status());
+        Todo todoToSave = new Todo(id, todoWOId.description(), todoWOId.status());
 
         return todoRepository.save(todoToSave);
     }
 
-    public Todo updateTodo(UpdateTodo todo, String id) {
+    public Todo updateTodo(TodoWOId todo, String id) {
         Todo todoToUpdate = new Todo(id, todo.description(), todo.status());
 
         return todoRepository.save(todoToUpdate);
@@ -41,5 +44,10 @@ public class TodoService {
 
     public void deleteTodo(String id) {
         todoRepository.deleteById(id);
+    }
+
+    @Override
+    public void generateStackOfTodos() {
+
     }
 }
